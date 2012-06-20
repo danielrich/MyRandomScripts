@@ -4,13 +4,12 @@ import sys
 import syslog
 import re
 
-from_email_pattern = re.compile('From: ([\w\-\.]+@(\w[\w\-]+\.)+[\w\-]+)')
-to_email_pattern = re.compile('To: ([\w\-\.]+@(\w[\w\-]+\.)+[\w\-]+)')
+from_email_pattern = re.compile('From:\s*([\w\-\.]+@(\w[\w\-]+\.)+[\w\-]+)')
+to_email_pattern = re.compile('To:\s*([\w\-\.]+@(\w[\w\-]+\.)+[\w\-]+)')
 
 def sendemail(msg, fromaddr, toaddr):
 	username = '**********'
 	password = ''
-
 	server = smtplib.SMTP('smtp.gmail.com:587')
 	server.set_debuglevel(1)
 	server.starttls()
@@ -20,6 +19,6 @@ def sendemail(msg, fromaddr, toaddr):
 
 if __name__ == "__main__":
    email = sys.stdin.read()
-   sender = from_email_pattern.match(email)
-   recp = to_email_pattern.match(email)
+   sender = from_email_pattern.search(email)
+   recp = to_email_pattern.search(email)
    sendemail(email, sender, recp)
