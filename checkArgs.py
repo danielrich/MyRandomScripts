@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import sys
-f = open('/var/log/sudoers', 'w')
+f = open('/var/log/argsResults', 'w')
 if (len(sys.argv) > 1):
    f.write (repr([( argum) for argum in sys.argv]))
 
