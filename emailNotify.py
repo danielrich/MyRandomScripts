@@ -1,36 +1,25 @@
+#!/usr/bin/python
 import smtplib
 import sys
 import syslog
 import re
 
-def sendemail(msg):
-	fromaddr = '**********@gmail.com'
-	toaddr = '***************@gmail.com'
+from_email_pattern = re.compile('From: ([\w\-\.]+@(\w[\w\-]+\.)+[\w\-]+)')
+to_email_pattern = re.compile('To: ([\w\-\.]+@(\w[\w\-]+\.)+[\w\-]+)')
+
+def sendemail(msg, fromaddr, toaddr):
 	username = '**********'
-	password = '************'
+	password = ''
 
 	server = smtplib.SMTP('smtp.gmail.com:587')
-	server.set_debuglevel(1)	
+	server.set_debuglevel(1)
 	server.starttls()
 	server.login(username,password)
-	server.sendmail(fromaddr, toaddr,  "dansguardian\n" + msg.strip() )
+	server.sendmail(fromaddr, toaddr,msg)
 	server.quit()
 
-def testLine(line, out_file):
-	result = re.findall(r'DENIED', line)
-	if result:
-		sendemail(line)
-		syslog.syslog('sent an email')
-	else:
-		out_file += "\n"  +line;
-			
-input_file = file('/var/log/dansguardian/access.log','r')
-oldFile = ""
-for line in input_file.readlines():
-	testLine(line, oldFile)	
-
-input_file.close()
-out_file = file('/var/log/dansguardian/access.log','w')
-out_file.write(oldFile)
-out_file.close()		
-		
+if __name__ == "__main__":
+   email = sys.stdin.read()
+   sender = from_email_pattern.match(email)
+   recp = to_email_pattern.match(email)
+   sendemail(email, sender, recp)
